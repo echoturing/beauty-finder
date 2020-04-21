@@ -26,6 +26,14 @@ async fn download(url: String) {
     println!("now download {}", url);
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert(reqwest::header::USER_AGENT, UA.parse().unwrap());
+
+    let parsed_url = urlparse::urlparse(&url);
+    let file_path = format!("{}{}", "images/", get_path_last(&parsed_url.path));
+
+    if std::path::Path::new(&file_path).exists() {
+        println!("file already exist");
+        return;
+    }
     let image_data = reqwest::Client::new()
         .get(&url)
         .headers(headers)
@@ -36,8 +44,8 @@ async fn download(url: String) {
         .await
         .unwrap();
 
-    let parsed_url = urlparse::urlparse(url);
-    tokio::fs::write(get_path_last(&parsed_url.path), image_data).await;
+
+    tokio::fs::write(file_path, image_data).await;
 }
 
 fn get_path_last(path: &str) -> String {
