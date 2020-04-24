@@ -1,13 +1,21 @@
 use std::collections::HashMap;
 use std::fs;
 
+use lazy_static::*;
 use libxml::parser::*;
 use libxml::xpath::Context;
+use reqwest;
 use tokio;
 
 const UA: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36";
 
 const SITE_MAP: &str = "https://www.vmgirls.com/sitemap.shtml";
+
+
+lazy_static! {
+    static ref HTTP_CLIENT: reqwest::Client = reqwest::Client::new();
+}
+
 
 
 pub async fn run() {
@@ -63,7 +71,7 @@ async fn get_site_map_data() -> Result<Vec<String>, Box<dyn std::error::Error>> 
 async fn async_do_request(url: &str) -> Result<String, Box<dyn std::error::Error>> {
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert(reqwest::header::USER_AGENT, UA.parse().unwrap());
-    let resp = reqwest::Client::new()
+    let resp = HTTP_CLIENT
         .get(url)
         .headers(headers)
         .send()

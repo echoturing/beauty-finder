@@ -45,6 +45,7 @@ name = "beauty-finder"
 version = "0.1.0"
 dependencies = [
  "failure",
+ "lazy_static",
  "libxml",
  "reqwest",
  "tokio",
